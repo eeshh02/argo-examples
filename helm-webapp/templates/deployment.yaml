@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Values.appName }}
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.replicas | default 3 }}
   selector:
     matchLabels:
       app: {{ .Values.appName }}
@@ -15,19 +15,20 @@ spec:
       labels:
         app: {{ .Values.appName }}
         tier: frontend
-    spec: # Pod spec
+    spec:
       containers:
       - name: mycontainer
         image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.port | default 80 }}
         envFrom:
         - configMapRef:
             name: {{ .Values.configmap.name }}
         resources:
           requests:
-            memory: "16Mi" 
-            cpu: "50m"    # 500milliCPUs (1/2 CPU)
+            memory: {{ .Values.resources.requests.memory | default "52Mi" | quote }}
+            cpu: {{ .Values.resources.requests.cpu | default "50m" | quote }}
           limits:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: {{ .Values.resources.limits.memory | default "128Mi" | quote }}
+            cpu: {{ .Values.resources.limits.cpu | default "100m" | quote }}
+            
